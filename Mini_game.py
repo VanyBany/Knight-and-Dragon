@@ -2,11 +2,10 @@ import random
 import time
 
 
-
-
 class Character:
     """Базовый класс для всех персонажей"""
     # Имя, здоровье, сила атаки, класс брони
+
     def __init__(self, name, health, attack_power, class_name, armor_class=10):
         self._name = name
         self._health = health
@@ -35,7 +34,7 @@ class Character:
         return self._health
 
     @health.setter
-    def health(self,value):
+    def health(self, value):
         self._health = value
 
     @property
@@ -51,16 +50,15 @@ class Character:
         return self._armor_class
 
     @staticmethod
-    def add_status_effect(target,status):
+    def add_status_effect(target, status):
         target_effects = target.access_status_effects
         target_effects[status] = 3
 
     def poison_status(self):
-        if  self._status_effects.get("Отравление",0) > 0:
+        if self._status_effects.get("Отравление", 0) > 0:
             self._status_effects["Отравление"] -= 1
-            self.health-=10
+            self.health -= 10
             print(f"{self.class_name} получает урон ядом!")
-
 
     def take_damage(self, damage):
         """Получение урона"""
@@ -72,13 +70,11 @@ class Character:
             self._is_alive = False
         return damage
 
-
-    def heal(self,hp):
+    def heal(self, hp):
         """Лечение"""
         current_hp = self._health
         self._health = min(self._health + hp, self._max_health)
         return self._health - current_hp
-
 
     def is_critical(self):
         """Проверка на крит.урон"""
@@ -90,33 +86,33 @@ class Character:
     def attack_power(self):
         """Получение значения базовой атаки с учётом крит.урона"""
         if self.is_critical():
-            return self._attack_power * 2,"Критический удар!"
+            return self._attack_power * 2, "Критический удар!"
         return self._attack_power, ""
 
-    def attack(self,target):
+    def attack(self, target):
         """Урон по цели с получением информации об ударе"""
-        damage,check_crit = self.attack_power()
+        damage, check_crit = self.attack_power()
         damage = target.take_damage(damage)
         attack_info = {"Damage": damage, "Crit_damage": check_crit}
         return attack_info
 
-
     # Бросок на попадание по цели
+
     @staticmethod
     def attack_roll():
         """Вычисление вероятности попадания"""
-        return random.randint(1,20)
+        return random.randint(1, 20)
 
-    def hit(self,target):
+    def hit(self, target):
         """Проверка на попадание по цели"""
         attack_roll = self.attack_roll()
         if attack_roll == 20:
             self._critical = True
-            return True,attack_roll
+            return True, attack_roll
         if attack_roll == 1:
-            return False,attack_roll
+            return False, attack_roll
         else:
-            return attack_roll >= target.armor_class,attack_roll
+            return attack_roll >= target.armor_class, attack_roll
 
     def __str__(self):
 
@@ -127,18 +123,17 @@ class Knight(Character):
     """Класс Рыцаря с особыми способностями"""
 
     def __init__(self, name):
-        super().__init__(name, 130, 20,"Рыцарь" , 12)
+        super().__init__(name, 130, 20, "Рыцарь", 12)
         self._heal_potions = 3
         self._shield_activated = False
         self._special_attack_available = True
-
 
     def shield_block(self):
         """Активация щита для снижения урона"""
         self._shield_activated = True
         return "🛡️ Рыцарь поднимает щит! Следующая атака будет ослаблена."
 
-    def special_attack(self,target):
+    def special_attack(self, target):
         """Особая атака рыцаря"""
         damage, check_crit = self.attack_power()
         if self._special_attack_available:
@@ -152,7 +147,6 @@ class Knight(Character):
         attack_info = {"Damage": damage, "Crit_damage": check_crit}
         return attack_info, message
 
-
     def take_damage(self, damage):
         """Переопределение получения урона с учетом щита"""
         if self._shield_activated:
@@ -165,13 +159,12 @@ class Knight(Character):
     def heal_potion(self):
         """Лечение"""
         if self._heal_potions > 0:
-            self._heal_potions-=1
+            self._heal_potions -= 1
             hp_recovered = super().heal(30)
             return True, hp_recovered
         else:
             print("Зелий здоровья больше не осталось.")
             return False, 0
-
 
     def __str__(self):
         return f"{super().__str__()} (Кол-во зелий здоровья: {self._heal_potions}) (Специальная атака: {"есть" if self._special_attack_available else "нет"})"
@@ -179,10 +172,9 @@ class Knight(Character):
 
 class Rogue(Character):
     def __init__(self, name):
-        super().__init__(name, 110, 25, "Плут",11)
+        super().__init__(name, 110, 25, "Плут", 11)
         self._heal_potions = 3
         self._special_attack_available = True
-
 
     def special_attack(self, target):
         """Особая атака рыцаря"""
@@ -205,11 +197,12 @@ class Rogue(Character):
         attack_roll = self.attack_roll()
         if attack_roll == 20:
             self._critical = True
-            return True,attack_roll
+            return True, attack_roll
         elif attack_roll == 1:
-            return False,attack_roll
+            return False, attack_roll
         else:
-            dodge_ability,message = (2,"Плут активно уворачивается!") if random.random() > 0.5 else (0,"")
+            dodge_ability, message = (
+                2, "Плут активно уворачивается!") if random.random() > 0.5 else (0, "")
             print(message)
             return attack_roll - dodge_ability >= target.armor_class, attack_roll - dodge_ability
 
@@ -231,14 +224,13 @@ class Dragon(Character):
     """Класс Дракона с особыми способностями"""
 
     def __init__(self, name):
-        super().__init__(name, 200, 35,"Дракон",14)
+        super().__init__(name, 200, 35, "Дракон", 14)
         self._fly_used = False
 
-    def fire_breath(self,target):
+    def fire_breath(self, target):
         """Огненное дыхание дракона"""
-        damage = random.randint(15, 30)
+        damage = random.randint(15, 40)
         check_crit = ""
-
 
         if self.is_critical():
             check_crit = "Критический удар!"
@@ -247,8 +239,6 @@ class Dragon(Character):
         damage = target.take_damage(damage)
         attack_info = {"Damage": damage, "Crit_damage": check_crit}
         return attack_info
-
-
 
     def fly(self):
         """Дракон взлетает, уклоняясь от атаки"""
@@ -267,7 +257,6 @@ class Dragon(Character):
         return damage
 
 
-
 class Game:
     """Основной класс игры"""
 
@@ -276,7 +265,6 @@ class Game:
         self.dragon = None
         self.game_over = False
         self.endings_unlocked = []
-
 
     def print_separator(self):
         print("\n" + "=" * 50)
@@ -309,7 +297,6 @@ class Game:
 
         return action
 
-
     def knight_turn(self):
         """Ход рыцаря"""
 
@@ -332,15 +319,16 @@ class Game:
         if choice == 1:
             self.slow_print("Рыцарь использует атаку мечом!")
 
-            check_hit,attack_roll = self.dragon.hit(self.dragon)
+            check_hit, attack_roll = self.dragon.hit(self.dragon)
 
             if check_hit:
                 attack_result = self.character.attack(self.dragon)
-                self.slow_print(f"⚔️ {attack_result["Crit_damage"]} Вы атакуете дракона и наносите {attack_result["Damage"]} урона!")
+                self.slow_print(
+                    f"⚔️ {attack_result["Crit_damage"]} Вы атакуете дракона и наносите {attack_result["Damage"]} урона!")
 
             else:
-                self.slow_print(f"Атака не увенчалась успехом и не пробила цель. {attack_roll} vs {self.dragon.armor_class}")
-
+                self.slow_print(
+                    f"Атака не увенчалась успехом и не пробила цель. {attack_roll} vs {self.dragon.armor_class}")
 
         elif choice == 2:
             message = self.character.shield_block()
@@ -348,21 +336,25 @@ class Game:
 
         elif choice == 3:
 
-            check_hit,attack_roll = self.character.hit(self.dragon)
+            check_hit, attack_roll = self.character.hit(self.dragon)
 
             if check_hit:
-                self.slow_print("⚔️ Рыцарь использует особую атаку! Усиленный удар!")
+                self.slow_print(
+                    "⚔️ Рыцарь использует особую атаку! Усиленный удар!")
                 attack_result, message = self.character.special_attack(self.dragon)
-                self.slow_print(f"{message} {attack_result["Crit_damage"]}Вы атакуете дракона и наносите {attack_result["Damage"]} урона!")
+
+                self.slow_print(
+                    f"{message} {attack_result["Crit_damage"]}Вы атакуете дракона и наносите {attack_result["Damage"]} урона!")
 
             else:
-                self.slow_print(f"Атака не увенчалась успехом и не пробила цель. {attack_roll} vs {self.dragon.armor_class}")
-
+                self.slow_print(
+                    f"Атака не увенчалась успехом и не пробила цель. {attack_roll} vs {self.dragon.armor_class}")
 
         elif choice == 4:
             condition, hp_recovered = self.character.heal_potion()
             if condition:
-                self.slow_print(f"❤️ Вы выпили зелье здоровья! Вы восстановили {hp_recovered} хп!")
+                self.slow_print(
+                    f"❤️ Вы выпили зелье здоровья! Вы восстановили {hp_recovered} хп!")
             else:
                 return False
         return True
@@ -392,21 +384,22 @@ class Game:
 
             if check_hit:
                 attack_result = self.character.attack(self.dragon)
-                self.slow_print(f"⚔️ {attack_result["Crit_damage"]} Вы атакуете дракона и наносите {attack_result["Damage"]} урона!")
-
+                self.slow_print(
+                    f"⚔️ {attack_result["Crit_damage"]} Вы атакуете дракона и наносите {attack_result["Damage"]} урона!")
 
             else:
-                self.slow_print(f"Атака не увенчалась успехом и не пробила цель. {attack_roll} vs {self.dragon.armor_class}")
-
-
+                self.slow_print(
+                    f"Атака не увенчалась успехом и не пробила цель. {attack_roll} vs {self.dragon.armor_class}")
 
         elif choice == 2:
 
             check_hit, attack_roll = self.dragon.hit(self.dragon)
 
             if check_hit:
-                self.slow_print("⚔️ Плут использует особую атаку! Ядовитый выпад!")
-                attack_result, message = self.character.special_attack(self.dragon)
+                self.slow_print(
+                    "⚔️ Плут использует особую атаку! Ядовитый выпад!")
+                attack_result, message = self.character.special_attack(
+                    self.dragon)
                 self.slow_print(
                     f"{message} {attack_result["Crit_damage"]}Вы атакуете дракона и наносите {attack_result["Damage"]} урона!")
 
@@ -414,15 +407,14 @@ class Game:
                 self.slow_print(
                     f"Атака не увенчалась успехом и не пробила цель. {attack_roll} vs {self.dragon.armor_class}")
 
-
         elif choice == 3:
             condition, hp_recovered = self.character.heal_potion()
             if condition:
-                self.slow_print(f"❤️ Вы выпили зелье здоровья! Вы восстановили {hp_recovered} хп!")
+                self.slow_print(
+                    f"❤️ Вы выпили зелье здоровья! Вы восстановили {hp_recovered} хп!")
             else:
                 return False
         return True
-
 
     def dragon_turn(self):
         """Ход дракона"""
@@ -440,7 +432,7 @@ class Game:
                 self.dragon._dodging = True
                 return
 
-        check_hit,attack_roll = self.character.hit(self.character)
+        check_hit, attack_roll = self.character.hit(self.character)
 
         if check_hit:
 
@@ -449,34 +441,26 @@ class Game:
                 self.slow_print(message)
                 attack_result = self.dragon.fire_breath(self.character)
 
-
             else:
                 message = "🐉 Дракон атакует когтями!"
                 self.slow_print(message)
                 attack_result = self.dragon.attack(self.character)
 
-
-
-            self.slow_print(f"{attack_result["Crit_damage"]} Дракон наносит вам {attack_result["Damage"]} урона!")
-
+            self.slow_print(
+                f"{attack_result["Crit_damage"]} Дракон наносит вам {attack_result["Damage"]} урона!")
 
         else:
-            self.slow_print(f"Атака не увенчалась успехом и не пробила цель. {attack_roll} vs {self.character.armor_class}")
-
-
-
-
-
-
+            self.slow_print(
+                f"Атака не увенчалась успехом и не пробила цель. {attack_roll} vs {self.character.armor_class}")
 
     def check_game_end(self):
         """Проверка условий окончания игры"""
         if not self.character.is_alive:
             self.game_over = True
-            if isinstance(self.character,Knight):
+            if isinstance(self.character, Knight):
                 ending = self.get_ending("heroic_knight_death")
                 self.show_ending(ending)
-            elif isinstance(self.character,Rogue):
+            elif isinstance(self.character, Rogue):
                 ending = self.get_ending("tragic_rogue_death")
                 self.show_ending(ending)
             return True
@@ -508,28 +492,24 @@ class Game:
             "victory": {
                 "title": "🏆 ПОБЕДА!",
                 "text": f"После ожесточенной битвы, {self.character.name} побеждает ужасного дракона! \n"
-                        "Королевство спасено, и ваше имя войдет в легенды!"
+                "Королевство спасено, и ваше имя войдет в легенды!"
             },
             "heroic_knight_death": {
                 "title": "💀 ГЕРОИЧЕСКАЯ ГИБЕЛЬ",
                 "text": f"Отважный {self.character.class_name.lower()} {self.character.name} пал в битве с драконом. \n"
-                        "Хотя вы и проиграли, ваша храбрость будет воспета в песнях!"
-
-
-
-
+                "Хотя вы и проиграли, ваша храбрость будет воспета в песнях!"
             },
 
             "tragic_rogue_death": {
                 "title": "💀 ТРАГИЧЕСКАЯ ГИБЕЛЬ",
                 "text": f"Проворный {self.character.class_name.lower()} {self.character.name} был раздавлен драконом, пока подбирался к нему. \n"
-                        "Хотя вы и проиграли, ваша проворность будет воспета в песнях!"
+                "Хотя вы и проиграли, ваша проворность будет воспета в песнях!"
 
             },
             "flawless_victory": {
                 "title": "⭐ БЕЗУПРЕЧНАЯ ПОБЕДА!",
                 "text": f"С невероятным мастерством {self.character.name} побеждает дракона \n"
-                        "практически не получив повреждений! Вы - настоящий герой!"
+                "практически не получив повреждений! Вы - настоящий герой!"
             },
         }
         return endings.get(ending_type, endings["victory"])
@@ -577,18 +557,17 @@ class Game:
         self.dragon = Dragon("Смауг")
 
         if choice == 1:
-            knight_name = input("Введите имя вашего рыцаря: ") or "Сэр Ланселот"
+            knight_name = input(
+                "Введите имя вашего рыцаря: ") or "Сэр Ланселот"
             self.character = Knight(knight_name)
-            self.slow_print(f"\nОтважный {self.character.name} выступает против дракона {self.dragon.name}!")
+            self.slow_print(
+                f"\nОтважный {self.character.name} выступает против дракона {self.dragon.name}!")
 
         if choice == 2:
             rogue_name = input("Введите имя вашего плута: ") or "Эцио Аудиторе"
             self.character = Rogue(rogue_name)
-            self.slow_print(f"\nПроворный {self.character.name} выступает против дракона {self.dragon.name}!")
-
-
-
-
+            self.slow_print(
+                f"\nПроворный {self.character.name} выступает против дракона {self.dragon.name}!")
 
         # Основной игровой цикл
         turn = 1
@@ -628,7 +607,8 @@ class Game:
             for ending in self.endings_unlocked:
                 print(f"  - {ending}")
 
-        play_again = input("\nХотите сыграть еще раз? (да/нет): ").lower().strip()
+        play_again = input(
+            "\nХотите сыграть еще раз? (да/нет): ").lower().strip()
         if play_again in ['да', 'д', 'yes', 'y']:
             self.__init__()  # Сброс игры
             self.start_game()
@@ -640,5 +620,3 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.start_game()
-
-
