@@ -558,7 +558,7 @@ class Game:
             except ValueError:
                 print("Пожалуйста, введите число")
 
-        self.dragon = Dragon("Смауг")
+        self.dragon = Dragon("Змей Горыныч")
 
         if choice == 1:
             knight_name = input(
